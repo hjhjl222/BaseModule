@@ -1,8 +1,6 @@
 package com.bhh.base.module
 
 import androidx.annotation.CallSuper
-import com.lpsjcx.channel.TraceManager
-import com.lpsjcx.channel.data.TraceEvent
 import com.bhh.tools.coroutines.GlobalScheduler
 import com.bhh.tools.coroutines.event.EventBus
 import com.bhh.tools.log.Logger

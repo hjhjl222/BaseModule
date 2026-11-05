@@ -1,23 +1,16 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
 }
 
-kotlin {
-    compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-    }
-}
-
-
 android {
     namespace = "com.bhh.base"
-    val app_compile_sdk_version: Int by rootProject.extra
-    compileSdk = app_compile_sdk_version
+    compileSdk = 37
 
     defaultConfig {
-        val app_min_sdk_version: Int by rootProject.extra
-        minSdk = app_min_sdk_version
+        minSdk = 29
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -26,8 +19,8 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(
-                    getDefaultProguardFile("proguard-android-optimize.txt"),
-                    "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
             )
         }
     }
@@ -37,15 +30,24 @@ android {
     }
 }
 
-dependencies {
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+    }
+}
 
-//    implementation(libs.androidx.core.ktx)
-    //noinspection [ByDesign1.5]LocalDependency
+dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+
+    // com.bhh.tools.*（ApplicationHandler / GlobalScheduler / EventBus / Logger）
+    // 由宿主工程（deviceMaster）提供，这里仅编译期可见，不打进产物。
+    // 独立构建（单仓库打开）时该子项目不存在，跳过以便配置阶段可正常通过。
+    if (rootProject.findProject(":tools") != null) {
+        compileOnly(project(":tools"))
+    }
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    compileOnly(project(":tools"))
-    compileOnly(project(":channel"))
 }
